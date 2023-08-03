@@ -80,7 +80,7 @@ abstract contract Ownable is Context {
     }
 }
 
-contract TesterRewards is Ownable {
+contract CoC_TesterRewards is Ownable {
   mapping(address => uint256) public rewardAmount;
   mapping(address => bool) public isClaimed;
 

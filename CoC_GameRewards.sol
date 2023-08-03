@@ -81,11 +81,13 @@ abstract contract Ownable is Context {
     }
 }
 
-contract ZkChickenGameRewards is Ownable {
+contract CoC_GameRewards is Ownable {
   struct Round {
     uint256 startTime;
     uint256 burnAmount;
+    uint256 rewardMultiplier;
     uint256 reward;
+    uint256 rewardTransferTime;
     bool unlocked;
   }
 
@@ -133,31 +135,33 @@ contract ZkChickenGameRewards is Ownable {
     itemContractAddress = newAddress;
   }
 
-  function updateLockedAmount() external onlyOwner {
-    totalLockedAmount = token.balanceOf(address(this));
-  }
-
   function burnerInput(uint256 burnAmount) external {
     require(_msgSender() == itemContractAddress, "Only the item contract can call this function!");
 
     // Save burn amount
-    rounds[currentRoundNumber].burnAmount += burnAmount;
     totalBurnAmount += burnAmount;
 
     // If we still have rewards to unlock, execute roundCheck
-    if (totalLockedAmount > 0) roundCheck();
+    if (totalLockedAmount > 0) roundCheck(burnAmount);
   }
 
-  function roundCheck() internal {
+  function roundCheck(uint256 burnAmount) internal {
     // Get the difference
     uint256 increment = (block.timestamp - rounds[currentRoundNumber].startTime) / roundLenght;
 
     // If it's been less than a week, don't execute any code
-    if (increment < 1) return;
+    if (increment < 1) { 
+      // If no increment, then just save the burn amount for the current week
+      rounds[currentRoundNumber].burnAmount += burnAmount;
+      return;
+    }
+
+    // If we have increment, then move on:
     
     // Save for the next round's time calculation
     uint256 currentStartTime = rounds[currentRoundNumber].startTime;
 
+    // Calculate the reward for ending week (current)
     uint256 rewardAmount = rounds[currentRoundNumber].burnAmount * rewardMultiplier;
 
     // If there is not enough token left in the contract, then give what is left
@@ -165,9 +169,13 @@ contract ZkChickenGameRewards is Ownable {
 
     // Save current round rewrads.
     rounds[currentRoundNumber].reward = rewardAmount;
+    rounds[currentRoundNumber].rewardMultiplier = rewardMultiplier;
     totalLockedAmount -= rewardAmount; // Reduce Remaining amount
 
     currentRoundNumber += increment; // Move on to the next round(s)
+    
+    // Save the last burn for the new week, because it happened when we are in the new week
+    rounds[currentRoundNumber].burnAmount += burnAmount;
 
     // Set the new start time
     rounds[currentRoundNumber].startTime = currentStartTime + (increment * roundLenght);
@@ -187,6 +195,7 @@ contract ZkChickenGameRewards is Ownable {
 
     uint256 rewardAmount = rounds[roundNumber].reward;
     rounds[roundNumber].reward = 0;
+    rounds[roundNumber].rewardTransferTime = block.timestamp;
 
     // Perform the state changes before interacting with other contracts
     totalUnlockedRewards += rewardAmount; // Total sent amount

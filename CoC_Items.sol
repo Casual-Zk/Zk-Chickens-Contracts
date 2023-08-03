@@ -14,7 +14,7 @@ interface IGameRewardsContract {
   function burnerInput(uint256 burnAmount) external;
 }
 
-contract ZkChickensItems is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
+contract CoC_Items is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
   struct Item {
     bool isActive;
     uint256 mintCost;
@@ -25,6 +25,7 @@ contract ZkChickensItems is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
 
   mapping(uint256 => Item) public items;
   mapping(address => mapping(uint256 => uint256)) public mintedAmount; // account => id => amount
+  mapping(address => mapping(uint256 => uint256)) public burnedAmount; // account => id => amount
 
   constructor(address tokenAddress, address gameRewardsContractAddress, uint256[] memory ids, uint256[] memory mintCosts) ERC1155("") {
     token = IERC20Burnable(tokenAddress);
@@ -62,7 +63,7 @@ contract ZkChickensItems is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
 
     // Burn tokens to mint item
     uint256 tokenAmount = amount * items[id].mintCost;
-    token.burnFrom(account, tokenAmount);
+    token.burnFrom(_msgSender(), tokenAmount);
 
     // Let the Game Rewards Contract to know burn amount
     gameRewardsContract.burnerInput(tokenAmount);
@@ -70,7 +71,7 @@ contract ZkChickensItems is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
     _mint(account, id, amount, data);
 
     // Save how many items this account minted
-    mintedAmount[account][id] = amount;
+    mintedAmount[account][id] += amount;
   }
 
   function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public
@@ -83,16 +84,30 @@ contract ZkChickensItems is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
       tokenAmount += amounts[i] * items[ids[i]].mintCost;
 
       // Save how many items this account minted
-      mintedAmount[to][ids[i]] = amounts[i];
+      mintedAmount[to][ids[i]] += amounts[i];
     }
     
     // Burn tokens to mint item
-    token.burnFrom(to, tokenAmount);
+    token.burnFrom(_msgSender(), tokenAmount);
 
     // Let the Game Rewards Contract to know burn amount
     gameRewardsContract.burnerInput(tokenAmount);
 
     _mintBatch(to, ids, amounts, data);
+  }
+
+  function burn(address account, uint256 id, uint256 value) public virtual override {
+    super.burn(account, id, value);
+
+    burnedAmount[account][id] += value;
+  }
+
+  function burnBatch(address account, uint256[] memory ids, uint256[] memory values) public virtual override{
+    super.burnBatch(account, ids, values);
+
+    for(uint i = 0; i < ids.length; i++){
+      burnedAmount[account][ids[i]] += values[i];
+    }
   }
 
   // The following functions are overrides required by Solidity.

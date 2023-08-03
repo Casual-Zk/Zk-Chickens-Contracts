@@ -81,7 +81,7 @@ abstract contract Ownable is Context {
     }
 }
 
-contract TeamVesting is Ownable {
+contract CoC_TeamVesting is Ownable {
   address public beneficiary;
   IERC20 public token;
   uint256 public vestingStartTime;
@@ -94,7 +94,7 @@ contract TeamVesting is Ownable {
     uint256 _vestingStartTime,
     uint256 _tokenAmount
   ) {
-    require(vestingStartTime >= block.timestamp, "Vesting start time must be in the future");
+    require(_vestingStartTime >= block.timestamp, "Vesting start time must be in the future");
     beneficiary = _beneficiary;
     vestingStartTime = _vestingStartTime;
     vestingEndTime = _vestingStartTime + 730 days; // 2 years vesting period

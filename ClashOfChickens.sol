@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ZkChickens is ERC20, ERC20Burnable, ERC20Snapshot, Ownable {
+contract ClashOfChickens is ERC20, ERC20Burnable, ERC20Snapshot, Ownable {
   constructor(
     address teamVestingContract,
     address testerRewardsContract,
