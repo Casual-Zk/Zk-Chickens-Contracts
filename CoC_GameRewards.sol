@@ -92,7 +92,7 @@ contract CoC_GameRewards is Ownable {
   }
 
   uint256 public roundLenght; // Adjustable
-  uint256 public rewardMultiplier; // Adjustable
+  uint256 public rewardMultiplier; // (%) Adjustable
   uint256 public currentRoundNumber;
   uint256 public totalBurnAmount;
   uint256 public totalUnlockedRewards;
@@ -107,7 +107,7 @@ contract CoC_GameRewards is Ownable {
   constructor(address receiverAddress, uint256 initialTokenAmount) {
     roundLenght = 10 minutes; // TEST
     currentRoundNumber = 1;
-    rewardMultiplier = 2;
+    rewardMultiplier = 100;
 
     rewardReceiver = receiverAddress;
     totalLockedAmount = initialTokenAmount;
@@ -162,7 +162,7 @@ contract CoC_GameRewards is Ownable {
     uint256 currentStartTime = rounds[currentRoundNumber].startTime;
 
     // Calculate the reward for ending week (current)
-    uint256 rewardAmount = rounds[currentRoundNumber].burnAmount * rewardMultiplier;
+    uint256 rewardAmount = (rounds[currentRoundNumber].burnAmount * rewardMultiplier) / 100;
 
     // If there is not enough token left in the contract, then give what is left
     if (rewardAmount > totalLockedAmount) rewardAmount = totalLockedAmount;
@@ -210,4 +210,4 @@ contract CoC_GameRewards is Ownable {
   function readTime() external view returns (uint256) {
     return block.timestamp;
   }
-}
+} 

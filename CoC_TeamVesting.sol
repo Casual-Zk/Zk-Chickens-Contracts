@@ -103,6 +103,7 @@ contract CoC_TeamVesting is Ownable {
 
   function unlockTokens() external {
     require(block.timestamp >= vestingStartTime, "Vesting has not started yet");
+    require(_msgSender() == beneficiary, "Only the beneficiary can unlock its tokens!");  
 
     uint256 currentTime = block.timestamp;
     uint256 timeElapsed = currentTime - vestingStartTime;
@@ -122,6 +123,22 @@ contract CoC_TeamVesting is Ownable {
 
     // Transfer the unlocked tokens to the beneficiary
     require(token.transfer(beneficiary, tokensUnlocked), "Token transfer failed");
+  }
+
+  function getRemainingAmount() public view returns (uint256) {
+    require(_msgSender() == beneficiary, "Only the beneficiary can view its tokens!");  
+
+    uint256 currentTime = block.timestamp;
+    uint256 timeElapsed = currentTime - vestingStartTime;
+
+    // Ensure the vesting period is not over
+    require(currentTime < vestingEndTime, "Vesting period has ended");
+
+    // Calculate the amount of tokens to unlock based on the elapsed time
+    uint256 tokensToUnlock = (totalTokens * timeElapsed) / (730 days);
+    uint256 tokensUnlocked = tokensToUnlock - unlockedTokens;  
+
+    return tokensUnlocked;
   }
 
   function updateTokenAddress(address _tokenAddress) external onlyOwner {
