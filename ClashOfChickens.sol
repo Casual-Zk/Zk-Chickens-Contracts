@@ -10,17 +10,14 @@ contract ClashOfChickens is ERC20, ERC20Burnable, ERC20Snapshot, Ownable {
   constructor(
     address teamVestingContract,
     address testerRewardsContract,
-    address liquidityPool,
     address gameRewardsContract
-  ) ERC20("Zk Chickens", "zkCHICKS") {
-    // Team gets 332k (3.32% of the total supply) locked for 2 years
-    _mint(teamVestingContract, 332000 ether); 
-    // Testers gets 68k (0.68% of the total supply) %100 Unlock
-    _mint(testerRewardsContract, 68250 ether);
-    // 100k for LP (1% of the total supply)
-    _mint(liquidityPool, 100000 ether);
-    // 9.5m for Game Rewards (95% of the total supply)
-    _mint(gameRewardsContract, 9499750 ether);
+  ) ERC20("Clash Of Chickens", "CoC") {
+    // Team gets 334k (3.32% of the total supply) locked for 2 years
+    _mint(teamVestingContract, 334000 ether); 
+    // Testers gets 66k (0.66% of the total supply) %100 Unlock
+    _mint(testerRewardsContract, 66000 ether);
+    // 9.6m for Game Rewards (96% of the total supply)
+    _mint(gameRewardsContract, 9600000 ether);
   }
 
   function snapshot() public onlyOwner {

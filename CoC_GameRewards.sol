@@ -115,26 +115,6 @@ contract CoC_GameRewards is Ownable {
     rounds[currentRoundNumber].startTime = block.timestamp; // TEST: Actual starting day: Monday
   }
 
-  function updateRoundLength(uint256 newLength) external onlyOwner {
-    roundLenght = newLength;
-  }
-
-  function updateRewardMultiplier(uint256 newMultiplier) external onlyOwner {
-    rewardMultiplier = newMultiplier;
-  }
-
-  function updateRewardReceiver(address newReceiver) external onlyOwner {
-    rewardReceiver = newReceiver;
-  }
-
-  function updateTokenAddress(address newAddress) external onlyOwner {
-    token = IERC20(newAddress);
-  }
-
-  function updateItemAddress(address newAddress) external onlyOwner {
-    itemContractAddress = newAddress;
-  }
-
   function burnerInput(uint256 burnAmount) external {
     require(_msgSender() == itemContractAddress, "Only the item contract can call this function!");
 
@@ -205,6 +185,26 @@ contract CoC_GameRewards is Ownable {
       token.transfer(rewardReceiver, rewardAmount),
       "Unlock failed!"
     );
+  }
+
+  function updateRoundLength(uint256 newLength) external onlyOwner {
+    roundLenght = newLength;
+  }
+
+  function updateRewardMultiplier(uint256 newMultiplier) external onlyOwner {
+    rewardMultiplier = newMultiplier;
+  }
+
+  function updateRewardReceiver(address newReceiver) external onlyOwner {
+    rewardReceiver = newReceiver;
+  }
+
+  function updateTokenAddress(address newAddress) external onlyOwner {
+    token = IERC20(newAddress);
+  }
+
+  function updateItemAddress(address newAddress) external onlyOwner {
+    itemContractAddress = newAddress;
   }
 
   function readTime() external view returns (uint256) {

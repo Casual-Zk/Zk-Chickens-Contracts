@@ -37,26 +37,6 @@ contract CoC_Items is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
     }    
   }
 
-  function updateTokenAddress(address tokenAddress) external onlyOwner {
-    token = IERC20Burnable(tokenAddress);
-  }
-
-  function updateContractAddress(address newAddress) external onlyOwner {
-    gameRewardsContract = IGameRewardsContract(newAddress);
-  }
-
-  function updateMintCost(uint256 id, uint256 newCost) external onlyOwner {
-    items[id].mintCost = newCost;
-  }
-
-  function setItemActivity(uint256 id, bool isActive) external onlyOwner {
-    items[id].isActive = isActive;
-  }
-
-  function setURI(string memory newuri) public onlyOwner {
-    _setURI(newuri);
-  }
-
   function mint(address account, uint256 id, uint256 amount, bytes memory data) public
   {
     require(items[id].isActive, "Item is not active!");
@@ -110,10 +90,30 @@ contract CoC_Items is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
     }
   }
 
-  // The following functions are overrides required by Solidity.
+  // The following function is overrides required by Solidity.
 
   function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal override(ERC1155, ERC1155Supply)
   {
     super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+  }
+
+  function updateTokenAddress(address tokenAddress) external onlyOwner {
+    token = IERC20Burnable(tokenAddress);
+  }
+
+  function updateGameRewardsAddress(address newAddress) external onlyOwner {
+    gameRewardsContract = IGameRewardsContract(newAddress);
+  }
+
+  function updateMintCost(uint256 id, uint256 newCost) external onlyOwner {
+    items[id].mintCost = newCost;
+  }
+
+  function setItemActivity(uint256 id, bool isActive) external onlyOwner {
+    items[id].isActive = isActive;
+  }
+
+  function setURI(string memory newuri) public onlyOwner {
+    _setURI(newuri);
   }
 }
